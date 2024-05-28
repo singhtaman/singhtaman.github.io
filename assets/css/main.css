@@ -3686,7 +3686,7 @@ input, select, textarea {
 		position: fixed;
 		text-align: right;
 		top: 0;
-		width: 10em;
+		width: 18em;
 		z-index: 10000;
 	}
 
