@@ -54,11 +54,6 @@ body {
 	-webkit-text-size-adjust: none;
 }
 
-#logo {
-    	width: 100px;
-    	height: 100px; 
-}
-
 mark {
 	background-color: transparent;
 	color: inherit;
