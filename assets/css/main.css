@@ -4032,6 +4032,11 @@ input, select, textarea {
 		background-size: cover;
 	}
 
+	#intro .credit {
+				position: absolute;
+				bottom: 5px; right: 5px; background: rgba(0,0,0,0.8); color: white; padding: 2px 5px; font-size: 0.4em; border-radius: 3px;
+		}
+
 		#intro p {
 			font-size: 1.25em;
 			color: white;
