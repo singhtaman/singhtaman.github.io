@@ -332,10 +332,11 @@ b, strong {
 	}
 
 	.hero-credit {
-		bottom: 0.5rem;
+		bottom: 0.4rem;
 		font-size: 0.75rem;
+		margin: 0;
 		position: absolute;
-		right: 0.75rem;
+		right: 0.4rem;
 	}
 
 		.hero-credit a {
@@ -427,14 +428,15 @@ b, strong {
 }
 
 	.card-media {
-		aspect-ratio: 16 / 9;
 		margin: 0;
 		position: relative;
 	}
 
+		/* Ratio on the img (not the figure) so portrait images can't stretch the box. */
 		.card-media img {
+			aspect-ratio: 16 / 9;
 			display: block;
-			height: 100%;
+			height: auto;
 			object-fit: cover;
 			width: 100%;
 		}
