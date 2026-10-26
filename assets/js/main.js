@@ -19,6 +19,10 @@
 			xsmall:   [ null,      '480px'  ]
 		});
 
+	// Respect reduced-motion preference for animated scrolling.
+		if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+			$.fx.off = true;
+
 	// Hack: Enable IE flexbox workarounds.
 		if (browser.name == 'ie')
 			$body.addClass('is-ie');
@@ -118,9 +122,8 @@
 			speed: 1000,
 			offset: function() {
 
-				// If <=large, >small, and sidebar is present, use its height as the offset.
+				// If <=large and sidebar is present (shown as a top bar), use its height as the offset.
 					if (breakpoints.active('<=large')
-					&&	!breakpoints.active('<=small')
 					&&	$sidebar.length > 0)
 						return $sidebar.height();
 
