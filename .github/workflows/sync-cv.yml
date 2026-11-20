@@ -1,0 +1,64 @@
+# Keeps doc/taman_CV.pdf in sync with the CV project on Overleaf.
+#
+# Runs every 6 hours (and on demand from the Actions tab). It clones the
+# Overleaf project over Git, and only if the Overleaf source has changed
+# since the last sync it compiles main.tex and commits the new PDF.
+#
+# Required repository secrets:
+#   OVERLEAF_TOKEN       Overleaf Git authentication token
+#   OVERLEAF_PROJECT_ID  ID from the project URL: overleaf.com/project/<ID>
+
+name: Sync CV from Overleaf
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-cv
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch CV source from Overleaf
+        id: src
+        env:
+          OVERLEAF_TOKEN: ${{ secrets.OVERLEAF_TOKEN }}
+          OVERLEAF_PROJECT_ID: ${{ secrets.OVERLEAF_PROJECT_ID }}
+        run: |
+          git clone --depth 1 "https://git:${OVERLEAF_TOKEN}@git.overleaf.com/${OVERLEAF_PROJECT_ID}" cv-src
+          rev="$(git -C cv-src rev-parse HEAD)"
+          echo "rev=${rev}" >> "$GITHUB_OUTPUT"
+          if [ "$(cat doc/.cv_overleaf_rev 2>/dev/null)" = "${rev}" ]; then
+            echo "Overleaf source unchanged (${rev}); nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compile CV
+        if: steps.src.outputs.changed == 'true'
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: cv-src
+          root_file: main.tex
+
+      - name: Commit updated CV
+        if: steps.src.outputs.changed == 'true'
+        run: |
+          cp cv-src/main.pdf doc/taman_CV.pdf
+          echo "${{ steps.src.outputs.rev }}" > doc/.cv_overleaf_rev
+          rm -rf cv-src
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add doc/taman_CV.pdf doc/.cv_overleaf_rev
+          git commit -m "Update CV from Overleaf (${{ steps.src.outputs.rev }})"
+          git push
